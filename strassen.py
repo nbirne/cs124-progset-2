@@ -2,6 +2,7 @@ import numpy as np
 import csv
 import time
 import sys
+import random 
 
 FLAG = int(sys.argv[1])
 DIMENSION = int(sys.argv[2])
@@ -114,4 +115,43 @@ def tests():
                 else:
                     print(f"Test failed: {N}x{N}, {low} to {high}")
 
-get_times()
+# get_times()
+
+
+
+def triangles(A):
+    A_2 = strassen(A, A, CUTOFF)
+    A_3 = strassen(A_2, A, CUTOFF)
+    
+    n = A_3.shape[0] # can also say len(A_3)
+
+    sum = 0
+    for i in range(n):
+        sum += A_3[i][i]
+    
+    return sum / 6
+
+
+def make_graph(p):
+    vertices = 1024
+    adj_matrix = np.empty((vertices, vertices))
+    for i in range(vertices): 
+        for j in range(vertices):
+            r = random.random()
+            if i == j: 
+                adj_matrix[i][j] = 0
+            else:
+                if r <= p:
+                    adj_matrix[i][j] = 1
+                else: 
+                    adj_matrix[i][j] = 0
+    return adj_matrix
+
+
+def get_triangles():
+    for p in [0.01, 0.02, 0.03, 0.04, 0.05]: 
+        A = make_graph(p)
+        num_triangles = triangles(A)
+        print(f"Number of triangles for p = {p} is {num_triangles} ")
+
+get_triangles()
