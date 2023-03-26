@@ -50,7 +50,7 @@ def strassen(X, Y, cutoff):
         padded_prod = strassen(X, Y, cutoff)
         prod = padded_prod[:n, :n]
 
-    elif n > 1:
+    else:
         mid = n // 2
 
         A = X[:mid, :mid]
