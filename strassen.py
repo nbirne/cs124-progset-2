@@ -21,7 +21,7 @@ def main():
             X[r][c] = file.readline()
     for r in range(DIMENSION):
         for c in range(DIMENSION):
-            Y[r][c] = int(file.readline())
+            Y[r][c] = file.readline()
 
     Z = strassen(X, Y, CUTOFF)
     for i in range(DIMENSION):
@@ -88,19 +88,17 @@ def get_times():
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
 
-        for N in (300, 2048, 4096):
+        for N in [1024, 2048]:
             rng = np.random.default_rng()
-            X = rng.integers(-5, 5, size=(N, N))
-            Y = rng.integers(-5, 5, size=(N, N))
+            X = rng.integers(-1, 3, size=(N, N))
+            Y = rng.integers(-1, 3, size=(N, N))
 
-            n0 = 8
-            while n0 <= 300:
+            for n0 in (64, 128, 256, 512, 1024):
                 start = time.time()
                 strassen(X, Y, n0)
                 end = time.time()
-                # csvwriter.writerow([n0, N, end - start])
+                csvwriter.writerow([n0, N, end - start])
                 print([n0, N, end - start])
-                n0 += 2
 
 def tests():
     rng = np.random.default_rng()
@@ -115,10 +113,6 @@ def tests():
                 else:
                     print(f"Test failed: {N}x{N}, {low} to {high}")
 
-# get_times()
-
-
-
 def triangles(A):
     A_2 = strassen(A, A, CUTOFF)
     A_3 = strassen(A_2, A, CUTOFF)
@@ -130,7 +124,6 @@ def triangles(A):
         sum += A_3[i][i]
     
     return sum / 6
-
 
 def make_graph(p):
     vertices = 1024
@@ -147,11 +140,10 @@ def make_graph(p):
                     adj_matrix[i][j] = 0
     return adj_matrix
 
-
 def get_triangles():
     for p in [0.01, 0.02, 0.03, 0.04, 0.05]: 
         A = make_graph(p)
         num_triangles = triangles(A)
         print(f"Number of triangles for p = {p} is {num_triangles} ")
 
-get_triangles()
+main()
