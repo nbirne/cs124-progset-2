@@ -27,12 +27,23 @@ def main():
     for i in range(DIMENSION):
         print(Z[i][i])
 
+# def conventional(X, Y):
+#     n = np.shape(X)[0]
+#     prod = np.empty([n, n], dtype=np.int32)
+#     for r in range(n):
+#         for c in range(n):
+#             prod[r][c] = np.dot(X[r, :], Y[:, c])
+#     return prod
+
 def conventional(X, Y):
     n = np.shape(X)[0]
     prod = np.empty([n, n], dtype=np.int32)
     for r in range(n):
         for c in range(n):
-            prod[r][c] = np.dot(X[r, :], Y[:, c])
+            entry = 0
+            for i, j in zip(X[r, :], Y[:, c]): 
+                entry += i * j
+            prod[r][c] = entry
     return prod
 
 def strassen(X, Y, cutoff):
@@ -40,8 +51,6 @@ def strassen(X, Y, cutoff):
 
     if n <= cutoff:
        return conventional(X, Y)
-
-    prod = np.empty([n, n], dtype=np.int32)
 
     # Pad with zeros if odd
     if n % 2:
@@ -90,10 +99,10 @@ def get_times():
 
         for N in [1024, 2048]:
             rng = np.random.default_rng()
-            X = rng.integers(-1, 3, size=(N, N))
-            Y = rng.integers(-1, 3, size=(N, N))
+            X = rng.integers(0, 2, size=(N, N))
+            Y = rng.integers(0, 2, size=(N, N))
 
-            for n0 in (64, 128, 256, 512, 1024):
+            for n0 in (8, 16, 32, 64, 128, 256, 512, 1024):
                 start = time.time()
                 strassen(X, Y, n0)
                 end = time.time()
