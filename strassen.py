@@ -8,7 +8,7 @@ FLAG = int(sys.argv[1])
 DIMENSION = int(sys.argv[2])
 FILE = sys.argv[3]
 
-CUTOFF = 512
+CUTOFF = 64
 
 def main():
     file = open(FILE, "r")
