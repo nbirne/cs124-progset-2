@@ -71,22 +71,44 @@ def strassen(X, Y, cutoff):
         G = Y[mid:, :mid]
         H = Y[mid:, mid:]
 
-        P1 = strassen(A, F - H, cutoff)
-        P2 = strassen(A + B, H, cutoff)
-        P3 = strassen(C + D, E, cutoff)
-        P4 = strassen(D, G - E, cutoff)
-        P5 = strassen(A + D, E + H, cutoff)
-        P6 = strassen(B - D, G + H, cutoff)
-        P7 = strassen(C - A, E + F, cutoff)
+        prod = np.zeros([n, n], dtype=np.int32)
+        Q1 = prod[:mid, :mid]
+        Q2 = prod[:mid, mid:]
+        Q3 = prod[mid:, :mid]
+        Q4 = prod[mid:, mid:]
 
-        Q1 = -P2 + P4 + P5 + P6
-        Q2 = P1 + P2 
-        Q3 = P3 + P4
-        Q4 = P1 - P3 + P5 + P7
+        # P1
+        P = strassen(A, F - H, cutoff)
+        Q2 += P
+        Q4 += P
 
-        top = np.concatenate((Q1, Q2), axis=1)
-        bottom = np.concatenate((Q3, Q4), axis=1)
-        prod = np.concatenate((top, bottom), axis=0)
+        # P2
+        P = strassen(A + B, H, cutoff)
+        Q1 -= P 
+        Q2 += P
+
+        # P3
+        P = strassen(C + D, E, cutoff)
+        Q3 += P
+        Q4 -= P
+
+        # P4
+        P = strassen(D, G - E, cutoff)
+        Q1 += P
+        Q3 += P
+
+        # P5
+        P = strassen(A + D, E + H, cutoff)
+        Q1 += P
+        Q4 += P
+
+        # P6 
+        P = strassen(B - D, G + H, cutoff)
+        Q1 += P 
+
+        # P7
+        P = strassen(C - A, E + F, cutoff)
+        Q4 += P
 
     return prod
 
@@ -97,17 +119,17 @@ def get_times():
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(fields)
 
-        for N in [1024, 2048]:
+        for N in [1025]:
             rng = np.random.default_rng()
-            X = rng.integers(0, 2, size=(N, N))
-            Y = rng.integers(0, 2, size=(N, N))
+            X = rng.integers(0, 3, size=(N, N))
+            Y = rng.integers(0, 3, size=(N, N))
 
-            for n0 in (8, 16, 32, 64, 128, 256, 512, 1024):
+            for n0 in (257, 129, 65, 33):
                 start = time.time()
                 strassen(X, Y, n0)
                 end = time.time()
                 csvwriter.writerow([n0, N, end - start])
-                print([n0, N, end - start])
+                print(n0, N, end - start)
 
 def tests():
     rng = np.random.default_rng()
@@ -155,4 +177,4 @@ def get_triangles():
         num_triangles = triangles(A)
         print(f"Number of triangles for p = {p} is {num_triangles} ")
 
-main()
+get_times()
